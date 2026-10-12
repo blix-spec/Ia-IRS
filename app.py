@@ -3,7 +3,6 @@ import os
 from google import genai
 from gtts import gTTS
 import streamlit as st
-from weasyprint import HTML
 
 # Configuration de la page Streamlit
 st.set_page_config(
@@ -49,7 +48,7 @@ with st.sidebar:
       "1. Saisissez votre clé API Gemini.\n2. Importez ou collez votre support"
       " (Texte, Audio, Image, PDF).\n3. L'IA génère une analyse rigoureuse,"
       " des exemples, des exercices, un résumé et des astuces mnémotechniques.\n4."
-      " Écoutez ou téléchargez le tout en PDF !"
+      " Écoutez ou téléchargez le tout !"
   )
 
 if not api_key:
@@ -135,7 +134,6 @@ if st.button("Lancer l'Analyse Académique & Pédagogique 🚀"):
         " en cours..."
     ):
       try:
-        # Prompt enrichi pour inclure exemples, exercices, réponses, résumé et mémorisation rapide
         prompt_system = (
             "Tu es 'IA IRS', un Super-Professeur académique, extrêmement"
             " rigoureux, critique et socratique. Ton rôle est d'analyser les"
@@ -212,47 +210,11 @@ if "last_analysis" in st.session_state:
         except Exception as e:
           st.error(f"Erreur lors de la génération audio : {e}")
 
-  # 2. Option de Téléchargement PDF
+  # 2. Option de Téléchargement du Rapport
   with col2:
-    if st.button("📥 Télécharger le rapport en PDF"):
-      with st.spinner("Génération du document PDF..."):
-        try:
-          html_content = f"""
-                    <!DOCTYPE html>
-                    <html lang="fr">
-                    <head>
-                        <meta charset="UTF-8">
-                        <style>
-                            @page {{ size: A4; margin: 20mm; background-color: #ffffff; }}
-                            body {{ font-family: Arial, sans-serif; color: #1e293b; line-height: 1.6; font-size: 11pt; }}
-                            h1 {{ color: #dc2626; border-bottom: 2px solid #dc2626; padding-bottom: 5px; }}
-                            h2, h3 {{ color: #1e293b; margin-top: 20px; }}
-                            p, li {{ margin-bottom: 8px; }}
-                            .footer {{ margin-top: 30px; font-size: 9pt; color: #64748b; text-align: center; border-top: 1px solid #cbd5e1; padding-top: 10px; }}
-                        </style>
-                    </head>
-                    <body>
-                        <h1>Rapport Pédagogique - IA IRS</h1>
-                        <p><em>Correction, Exemples, Exercices & Mémorisation Rapide</em></p>
-                        <hr>
-                        <div>
-                            {st.session_state["last_analysis"].replace(chr(10), '<br>')}
-                        </div>
-                        <div class="footer">
-                            Généré par IA IRS - Super-Professeur | Conforme aux sources académiques vérifiées.
-                        </div>
-                    </body>
-                    </html>
-                    """
-          pdf_path = "/tmp/Rapport_IA_IRS.pdf"
-          HTML(string=html_content).write_pdf(pdf_path)
-
-          with open(pdf_path, "rb") as pdf_file:
-            st.download_button(
-                label="💾 Cliquer ici pour télécharger le PDF",
-                data=pdf_file,
-                file_name="Rapport_IA_IRS.pdf",
-                mime="application/pdf",
-            )
-        except Exception as e:
-          st.error(f"Erreur lors de la création du PDF : {e}")
+    st.download_button(
+        label="📥 Télécharger le rapport (TXT)",
+        data=st.session_state["last_analysis"],
+        file_name="Rapport_IA_IRS.txt",
+        mime="text/plain",
+    )
