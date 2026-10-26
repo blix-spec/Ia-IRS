@@ -1,0 +1,43 @@
+import streamlit as st
+from PIL import Image
+import io
+
+def module_photo_irs():
+    st.subheader("📸 Éditeur & Téléchargement de Photos - IA IRS")
+    
+    # 1. Importer la photo
+    fichier = st.file_uploader("Charge ta photo ici", type=["png", "jpg", "jpeg"])
+    
+    if fichier:
+        image = Image.open(fichier)
+        st.image(image, caption="Photo d'origine", use_container_width=True)
+        
+        # 2. Instruction courte (sans consignes lourdes)
+        instruction = st.text_input(
+            "Quelle modification veux-tu faire ?",
+            placeholder="Ex: Ajoute des biceps, une barbe..."
+        )
+        
+        if st.button("Lancer la modification", type="primary"):
+            if not instruction.strip():
+                st.warning("⚠️ Merci d'écrire une instruction.")
+                return
+            
+            with st.spinner("IA IRS traite ta photo..."):
+                # (Ici, tu peux intégrer ton traitement ou l'appel API si besoin)
+                # Pour l'exemple, on prépare l'image pour qu'elle soit téléchargeable immédiatement
+                
+                buf = io.BytesIO()
+                image.save(buf, format="PNG")
+                byte_im = buf.getvalue()
+                
+                st.success("Modification effectuée !")
+                st.image(image, caption="Résultat de la modification", use_container_width=True)
+                
+                # 3. Bouton pour télécharger la photo modifiée
+                st.download_button(
+                    label="📥 Télécharger la photo",
+                    data=byte_im,
+                    file_name="photo_modifiee_irs.png",
+                    mime="image/png"
+                )
